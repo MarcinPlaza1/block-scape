@@ -1,0 +1,1 @@
+export { apiFetch, clearAuth, setAuth, getAuthToken, API_BASE } from '@/shared/api/client';

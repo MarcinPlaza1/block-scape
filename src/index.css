@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Sandbox 3D Platform Design System - Professional Dark Theme */
+
+@layer base {
+  :root {
+    /* Friendly professional dark theme */
+    --background: 222 14% 9%;
+    --foreground: 220 10% 95%;
+    --font-scale: 1;
+
+    --card: 222 14% 11%;
+    --card-foreground: 220 10% 95%;
+
+    --popover: 222 14% 12%;
+    --popover-foreground: 220 10% 95%;
+
+    /* Brand accents */
+    --primary: 216 88% 58%;
+    --primary-foreground: 222 14% 9%;
+
+    --secondary: 222 14% 15%;
+    --secondary-foreground: 220 10% 88%;
+
+    --muted: 222 14% 12%;
+    --muted-foreground: 220 10% 68%;
+
+    --accent: 191 72% 46%;
+    --accent-foreground: 222 14% 9%;
+
+    /* Semantics */
+    --success: 148 58% 46%;
+    --success-foreground: 222 14% 9%;
+    --warning: 35 92% 56%;
+    --warning-foreground: 222 14% 9%;
+    --info: 199 94% 62%;
+    --info-foreground: 222 14% 9%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 220 10% 96%;
+
+    --border: 222 12% 20%;
+    --input: 222 12% 16%;
+    --ring: 216 88% 58%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar styling */
+    --sidebar-background: 220 13% 6%;
+    --sidebar-foreground: 220 8% 90%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-accent: 220 13% 10%;
+    --sidebar-accent-foreground: 220 8% 85%;
+    --sidebar-border: 220 13% 18%;
+    --sidebar-ring: 217 91% 60%;
+
+    /* Custom gradients and effects */
+    --gradient-primary: linear-gradient(135deg, hsl(216 88% 58%) 0%, hsl(232 70% 52%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(148 58% 46%) 0%, hsl(158 52% 50%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(35 92% 56%) 0%, hsl(45 86% 50%) 100%);
+    --gradient-bg: linear-gradient(180deg,
+      hsl(214 36% 14%) 0%,
+      hsl(235 34% 18%) 45%,
+      hsl(270 28% 20%) 100%
+    );
+
+    /* Shadows and glows */
+    --shadow-sm: 0 2px 6px hsl(220 13% 5% / 0.35);
+    --shadow-md: 0 6px 16px hsl(220 13% 5% / 0.35);
+    --shadow-lg: 0 10px 25px -3px hsl(220 13% 4% / 0.5), 0 4px 6px -2px hsl(220 13% 4% / 0.1);
+    --shadow-glow: 0 0 18px hsl(216 88% 58% / 0.25);
+    --shadow-success-glow: 0 0 18px hsl(148 58% 46% / 0.25);
+    --shadow-warning-glow: 0 0 18px hsl(35 92% 56% / 0.25);
+
+    /* Transitions */
+    --transition-fast: all 0.14s cubic-bezier(.2,.9,.2,1);
+    --transition-smooth: all 0.24s cubic-bezier(.4, 0, .2, 1);
+    --transition-bounce: all 0.28s cubic-bezier(.68, -.55, .265, 1.55);
+
+    /* Brand section roles */
+    --brand-build: 216 88% 58%;
+    --brand-play: 148 58% 46%;
+    --brand-market: 35 92% 56%;
+    --brand-news: 266 72% 68%;
+  }
+
+  /* Kids theme: friendlier palette and slightly larger base font */
+  [data-theme="kids"] {
+    --background: 218 40% 12%;
+    --foreground: 220 12% 96%;
+    --card: 220 30% 18%;
+    --card-foreground: 220 12% 96%;
+    --primary: 266 72% 68%;
+    --primary-foreground: 222 14% 9%;
+    --secondary: 200 50% 26%;
+    --secondary-foreground: 220 10% 90%;
+    --accent: 190 75% 50%;
+    --accent-foreground: 222 14% 9%;
+    --border: 220 15% 24%;
+    --sidebar-background: 220 16% 7%;
+    --sidebar-accent: 220 16% 12%;
+    --success: 150 56% 46%;
+    --warning: 37 92% 58%;
+    --info: 199 92% 64%;
+    --ring: 266 72% 68%;
+    --gradient-primary: linear-gradient(135deg, hsl(266 72% 68%) 0%, hsl(190 75% 50%) 100%);
+    --font-scale: 1.1;
+    --radius: 1rem;
+  }
+
+  /* High contrast: accessibility-first palette */
+  [data-theme="contrast"] {
+    --background: 220 15% 5%;
+    --foreground: 0 0% 100%;
+    --card: 220 15% 7%;
+    --card-foreground: 0 0% 100%;
+    --primary: 49 100% 54%; /* strong yellow */
+    --primary-foreground: 220 15% 5%;
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.24;
+    --ring: 49 100% 54%;
+    --font-scale: 1.125;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  html {
+    font-size: calc(16px * var(--font-scale));
+  }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent;
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Reduced motion (toggleable via data attribute) */
+  [data-reduce-motion="true"] *,
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum GameRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model User {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  name      String
+  avatarUrl String?
+  passwordHash String
+  role      Role    @default(USER)
+  games     Game[]
+  sessions  Session[]
+  memberships GameMember[]
+  logs      AuditLog[]
+  likes     Like[]
+  scores    Score[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Game {
+  id        String   @id @default(cuid())
+  name      String
+  blocks    Json
+  published Boolean  @default(false)
+  thumbnail String?
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  members   GameMember[]
+  likes     Like[]
+  scores    Score[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model GameMember {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  role      GameRole @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, gameId])
+  @@index([gameId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  action    String
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+}
+
+
+model Like {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gameId])
+  @@index([gameId])
+  @@index([userId])
+}
+
+model Score {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  timeMs    Int
+  createdAt DateTime @default(now())
+
+  @@index([gameId])
+  @@index([userId])
+}
+
+

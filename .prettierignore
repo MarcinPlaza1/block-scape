@@ -1,0 +1,8 @@
+dist
+node_modules
+coverage
+.changeset
+*.lock
+*.log
+server/prisma/**/dev.db
+
