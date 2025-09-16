@@ -32,3 +32,19 @@ coverage/
 **/dev.db
 server/prisma/dev.db
 server/server/prisma/dev.db
+
+# Environment files
+.env
+.env.*.local
+*.env
+*.env.local
+
+# Databases
+*.db
+*.db-journal
+server/prisma/*.db
+server/prisma/server/*.db
+
+# Test and coverage artifacts
+coverage
+test-results
