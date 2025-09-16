@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+﻿# Welcome to your Lovable project
 
 ## Project info
 
@@ -76,7 +76,7 @@ Create a `.env` file in the repo root with for example:
 ```
 NODE_ENV=development
 PORT=3001
-CORS_ORIGIN=http://localhost:8080
+CORS_ORIGIN=http://localhost:9000
 BACKEND_ORIGIN=http://localhost:3001
 
 # SQLite path relative to repo root

@@ -7,7 +7,7 @@ export function attachEditorInput(params: {
   raycasterRef: React.MutableRefObject<THREE.Raycaster | null>;
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
   isDraggingRef: React.MutableRefObject<boolean>;
-  selectedTool: 'select' | 'move';
+  selectedTool: 'select' | 'move' | (() => 'select' | 'move');
   selectedBlockIdsRef: React.MutableRefObject<string[] | null>;
   blocksRef: React.MutableRefObject<Array<any>>;
   groundRef: React.MutableRefObject<THREE.Mesh | null>;
@@ -24,7 +24,7 @@ export function attachEditorInput(params: {
   deselectBlock: () => void;
 }) {
   const lastMoveRef = { time: 0 };
-  const throttleMs = 16;
+  const throttleMs = 16;\r\n\r\n  const getSelectedTool = () => (typeof params.selectedTool === 'function' ? params.selectedTool() : params.selectedTool);
 
   const onMouseMove = (event: MouseEvent) => {
     const now = performance.now();
@@ -73,7 +73,7 @@ export function attachEditorInput(params: {
 
   const onClick = (event: MouseEvent) => {
     if (params.isPlayMode) return;
-    if (!params.raycasterRef.current || !params.cameraRef.current || !params.sceneRef.current) return;
+    if (!params.raycasterRef.current || !params.cameraRef.current || !params.sceneRef.current) return;\r\n    const tool = getSelectedTool();
     params.raycasterRef.current.setFromCamera((params.tempNdc.current as any), params.cameraRef.current);
     const blockMeshes = params.blocksRef.current.filter(b => !b.hidden).map(b => b.mesh).filter(Boolean) as THREE.Object3D[];
     const intersects = params.raycasterRef.current.intersectObjects(blockMeshes);
@@ -81,15 +81,15 @@ export function attachEditorInput(params: {
       const clickedMesh = intersects[0].object;
       const clickedBlock = params.blocksRef.current.find(b => b.mesh === clickedMesh);
       if (!clickedBlock) return;
-      if (params.selectedTool === 'select') {
+      if (tool === 'select') {
         params.selectBlock(clickedBlock);
-      } else if (params.selectedTool === 'move') {
+      } else if (tool === 'move') {
         if (!clickedBlock.locked) {
           params.startDragging(clickedBlock, intersects[0].point.clone());
         }
       }
     } else {
-      if (params.selectedTool === 'select') params.deselectBlock();
+      if (tool === 'select') params.deselectBlock();
     }
   };
 
@@ -103,5 +103,4 @@ export function attachEditorInput(params: {
     params.mount.removeEventListener('click', onClick);
   };
 }
-
 

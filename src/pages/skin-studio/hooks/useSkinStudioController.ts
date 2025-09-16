@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+锘縤mport { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as BABYLON from '@babylonjs/core';
 import {
   ActiveLayer,
@@ -44,7 +44,7 @@ import type {
 } from '../types';
 
 
-const toHex = (n: number) => #;
+const toHex = (n: number) => `#${((n >>> 0) & 0xffffff).toString(16).padStart(6, '0')}`;
 
 const fromHex = (value: string, fallback: number) => {
   try {
@@ -280,8 +280,8 @@ export const useSkinStudioController = (): SkinStudioController => {
       setMySkins(response.skins || []);
     } catch (error: any) {
       toast({
-        title: 'Nie udalo sie pobrac skin體',
-        description: error?.message || 'Spr骲uj ponownie p髗niej.',
+        title: 'Failed to fetch skins',
+        description: error?.message || 'Spr贸buj ponownie p贸zniej.',
         variant: 'destructive',
       });
     } finally {
@@ -297,8 +297,8 @@ export const useSkinStudioController = (): SkinStudioController => {
       setMarketplaceListings(response.listings || []);
     } catch (error: any) {
       toast({
-        title: 'Nie udalo sie pobrac marketplace',
-        description: error?.message || 'Spr骲uj ponownie p髗niej.',
+        title: 'Failed to fetch marketplace',
+        description: error?.message || 'Spr贸buj ponownie p贸zniej.',
         variant: 'destructive',
       });
     } finally {
@@ -328,8 +328,8 @@ export const useSkinStudioController = (): SkinStudioController => {
         };
       } catch (error: any) {
         toast({
-          title: 'Nie udalo sie wczytac skina',
-          description: error?.message || 'Niepoprawny format danych.',
+          title: 'Failed to load skin',
+          description: error?.message || 'Invalid data format.',
           variant: 'destructive',
         });
         return null;
@@ -371,11 +371,11 @@ export const useSkinStudioController = (): SkinStudioController => {
             skinSecondary: secondary,
           } as any);
         }
-        toast({ title: 'Skin zastosowany', description: 'Skin zostal ustawiony.' });
+        toast({ title: 'Skin applied', description: 'Skin has been applied.' });
       } catch (error: any) {
         toast({
-          title: 'Nie udalo sie zastosowac',
-          description: error?.message || 'Spr骲uj ponownie p髗niej.',
+          title: 'Failed to apply skin',
+          description: error?.message || 'Spr贸buj ponownie p贸zniej.',
           variant: 'destructive',
         });
       }
@@ -1100,8 +1100,8 @@ export const useSkinStudioController = (): SkinStudioController => {
       toast({ title: 'Zaimportowano (RLE)', description: 'Voxele zaladowane.' });
     } catch (error: any) {
       toast({
-        title: 'Blad importu',
-        description: error?.message || 'Nieprawidlowy format',
+        title: 'Import error',
+        description: error?.message || 'Invalid format',
         variant: 'destructive',
       });
     }
@@ -1111,7 +1111,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     try {
       if (!authUser) {
         toast({
-          title: 'Wymagane logowanie',
+          title: 'Login required',
           description: 'Zaloguj sie, aby zapisac do konta',
           variant: 'destructive',
         });
@@ -1124,7 +1124,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     } catch (error: any) {
       toast({
         title: 'Blad zapisu',
-        description: error?.message || 'Nie udalo sie zapisac',
+        description: error?.message || 'Failed to save',
         variant: 'destructive',
       });
     }
@@ -1134,7 +1134,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     try {
       if (!authUser) {
         toast({
-          title: 'Wymagane logowanie',
+          title: 'Login required',
           description: 'Zaloguj sie, aby wczytac z konta',
           variant: 'destructive',
         });
@@ -1157,14 +1157,14 @@ export const useSkinStudioController = (): SkinStudioController => {
       } else {
         toast({
           title: 'Brak danych RLE',
-          description: 'Nie znaleziono voxelsRLE w profilu',
+          description: 'No voxelsRLE found in profile',
           variant: 'destructive',
         });
       }
     } catch (error: any) {
       toast({
         title: 'Blad wczytywania',
-        description: error?.message || 'Nie udalo sie wczytac',
+        description: error?.message || 'Failed to load',
         variant: 'destructive',
       });
     }
@@ -1181,7 +1181,7 @@ export const useSkinStudioController = (): SkinStudioController => {
   );
 
   const handlePresetSave = useCallback(() => {
-    const name = prompt('Nazwa presetu:', 'M骿 skin');
+    const name = prompt('Preset name:', 'M贸j skin');
     if (!name) return;
     const preset: SkinPreset = {
       id: Date.now().toString(36),
@@ -1230,7 +1230,7 @@ export const useSkinStudioController = (): SkinStudioController => {
       if (parsed && parsed.voxels) setVoxels(parsed.voxels);
       toast({ title: 'Zaimportowano', description: 'Voxele zaladowane.' });
     } catch {
-      toast({ title: 'Blad importu', description: 'Nieprawidlowy format', variant: 'destructive' });
+      toast({ title: 'Import error', description: 'Invalid format', variant: 'destructive' });
     }
   }, [toast]);
   const handleSave = useCallback(async () => {
@@ -1248,12 +1248,12 @@ export const useSkinStudioController = (): SkinStudioController => {
       }
       toast({
         title: 'Zapisano',
-        description: authUser ? 'Skin zapisany w koncie.' : 'Skin zapisany lokalnie.',
+        description: authUser ? 'Skin saved to account.' : 'Skin saved locally.',
       });
     } catch (error: any) {
       toast({
         title: 'Blad zapisu',
-        description: error?.message || 'Nie udalo sie zapisac',
+        description: error?.message || 'Failed to save',
         variant: 'destructive',
       });
     }
@@ -1320,7 +1320,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     async (name: string, publish: boolean) => {
       if (!authUser) {
         toast({
-          title: 'Wymagane logowanie',
+          title: 'Login required',
           description: 'Zaloguj sie, aby zapisywac skiny.',
           variant: 'destructive',
         });
@@ -1382,7 +1382,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     async (skin: SkinWithListings, priceInput: string) => {
       const price = parsePriceInput(priceInput);
       if (price === null) {
-        toast({ title: 'Nieprawidlowa cena', description: 'Podaj poprawna cene.', variant: 'destructive' });
+        toast({ title: 'Invalid price', description: 'Provide a valid price.', variant: 'destructive' });
         return;
       }
       await runWithBusy(`listing-create-${skin.id}`, async () => {
@@ -1398,7 +1398,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     async (skin: SkinWithListings, listingId: string, priceInput: string) => {
       const price = parsePriceInput(priceInput);
       if (price === null) {
-        toast({ title: 'Nieprawidlowa cena', description: 'Podaj poprawna cene.', variant: 'destructive' });
+        toast({ title: 'Invalid price', description: 'Provide a valid price.', variant: 'destructive' });
         return;
       }
       await runWithBusy(`listing-update-${listingId}`, async () => {
@@ -1414,7 +1414,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     async (skin: SkinWithListings, listingId: string) => {
       await runWithBusy(`listing-cancel-${listingId}`, async () => {
         await SkinsService.cancelListing(skin.id, listingId);
-        toast({ title: 'Anulowano oferte', description: 'Oferta zostala usunieta.' });
+        toast({ title: 'Listing cancelled', description: 'Listing was removed.' });
         await refreshMySkins();
       });
     },
@@ -1666,3 +1666,7 @@ export const useSkinStudioController = (): SkinStudioController => {
     isActionBusy,
   };
 };
+
+
+
+

@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:web": "vite",
+    "dev:api": "npm run server:dev",
+    "dev:all": "concurrently -n web,api -c blue,magenta npm:dev:web npm:dev:api",
     "db:generate": "prisma generate --schema ./server/prisma/schema.prisma",
     "db:migrate": "prisma migrate deploy --schema ./server/prisma/schema.prisma",
     "db:push": "prisma db push --schema ./server/prisma/schema.prisma",
@@ -104,6 +107,7 @@
     "@vitejs/plugin-react-swc": "^3.11.0",
     "@vitest/coverage-v8": "^2.0.5",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.0.1",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^5.2.0",

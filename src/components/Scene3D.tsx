@@ -51,6 +51,21 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
   const checkpointRef = useRef<THREE.Vector3 | null>(null);
   const lastFinishAtRef = useRef<number>(0);
   
+  const callbacksRef = useRef<{
+    onGameStart?: Scene3DProps['onGameStart'];
+    onGameCheckpoint?: Scene3DProps['onGameCheckpoint'];
+    onGameFinish?: Scene3DProps['onGameFinish'];
+    onGameHazard?: Scene3DProps['onGameHazard'];
+  }>({
+    onGameStart,
+    onGameCheckpoint,
+    onGameFinish,
+    onGameHazard,
+  });
+
+  useEffect(() => {
+    callbacksRef.current = { onGameStart, onGameCheckpoint, onGameFinish, onGameHazard };
+  }, [onGameStart, onGameCheckpoint, onGameFinish, onGameHazard]);
   // temp objects to reduce allocations
   const tempNdc = useRef<THREE.Vector2>(new THREE.Vector2());
   const tempVec3 = useRef<THREE.Vector3>(new THREE.Vector3());
@@ -119,6 +134,23 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
     } catch {}
     updateGhostColor();
   }, [builderCurrentColor]);
+
+  const selectedToolRef = useRef<Scene3DProps['selectedTool']>(selectedTool);
+  useEffect(() => {
+    selectedToolRef.current = selectedTool;
+  }, [selectedTool]);
+
+  const placeMultipleRef = useRef<boolean>(!!placeMultiple);
+  useEffect(() => {
+    placeMultipleRef.current = !!placeMultiple;
+  }, [placeMultiple]);
+
+  const latestSelectedBlockIdsRef = useRef<string[] | null>(selectedBlockIds || null);
+  useEffect(() => {
+    latestSelectedBlockIdsRef.current = selectedBlockIds || null;
+  }, [selectedBlockIds]);
+
+
 
   useEffect(() => { snapEnabledRef.current = !!snapEnabled; }, [snapEnabled]);
   useEffect(() => { snapSizeRef.current = Number(snapSize) || 1; }, [snapSize]);
@@ -247,6 +279,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
       if (now - lastMoveRef.time < throttleMs) return;
       lastMoveRef.time = now;
       if (isPlayMode || document.pointerLockElement === mountRef.current) return; // Disable editor controls when playing with pointer lock
+      const currentTool = selectedToolRef.current;
 
       if (isDraggingRef.current) {
         if (mountRef.current && cameraRef.current) {
@@ -292,7 +325,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
       }
 
       // Painting while mouse is down
-      if (paintingRef.current && selectedTool === 'paint') {
+      if (paintingRef.current && currentTool === 'paint') {
         try {
           if (!raycasterRef.current || !cameraRef.current || !mountRef.current) return;
           const rect = mountRef.current.getBoundingClientRect();
@@ -412,9 +445,10 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
     const handleClick = (event: MouseEvent) => {
       if (isPlayMode) return; // Disable editor interactions in play mode
       if (cameraDragActiveRef.current) return; // suppress click after drag
+      const currentTool = selectedToolRef.current;
 
       // Painting single-click
-      if (selectedTool === 'paint' && raycasterRef.current && cameraRef.current && sceneRef.current) {
+      if (currentTool === 'paint' && raycasterRef.current && cameraRef.current && sceneRef.current) {
         try {
           if (mountRef.current) {
             const rect = mountRef.current.getBoundingClientRect();
@@ -499,7 +533,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
               undefined,
               (['cube_bouncy','cube_ice','cube_conveyor'].includes(droppedBlockRef.current.type as any) ? undefined : (getTypeDefaultColor(droppedBlockRef.current.type) ?? builderColorRef.current))
             );
-            if (!placeMultiple) {
+            if (!placeMultipleRef.current) {
               removeGhost();
               // Clear armed placement locally to avoid accidental double placement
               droppedBlockRef.current = null;
@@ -561,7 +595,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
         } catch (e) {
           console.log('Builder place error:', e);
         }
-      } else if (selectedTool && raycasterRef.current && cameraRef.current && sceneRef.current) {
+      } else if (currentTool && raycasterRef.current && cameraRef.current && sceneRef.current) {
         // Handle tool interactions
         try {
           raycasterRef.current.setFromCamera(mouseRef.current!, cameraRef.current);
@@ -575,12 +609,13 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
             const clickedBlock = blocksRef.current.find(block => block.mesh === clickedMesh);
             
             if (clickedBlock) {
-              if (selectedTool === 'select') {
+              if (currentTool === 'select') {
                 selectBlock(clickedBlock);
-              } else if (selectedTool === 'move') {
+              } else if (currentTool === 'move') {
                 if (!clickedBlock.locked) {
                   // Prepare group drag context using current multi-selection
-                  const idsSet = new Set<string>([clickedBlock.id, ...((selectedBlockIds || []) as string[])]);
+                  const currentSelectedIds = latestSelectedBlockIdsRef.current || [];
+                  const idsSet = new Set<string>([clickedBlock.id, ...currentSelectedIds]);
                   const ids = Array.from(idsSet);
                   groupSelectedIdsRef.current = ids;
                   groupInitialPositionsRef.current.clear();
@@ -595,7 +630,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
             }
           } else {
             // Clicked on empty space, deselect
-            if (selectedTool === 'select') {
+            if (currentTool === 'select') {
               deselectBlock();
             }
           }
@@ -607,7 +642,8 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
 
     const handleMouseDown = (event: MouseEvent) => {
       if (isPlayMode) return;
-      if (selectedTool !== 'paint') return;
+      const currentTool = selectedToolRef.current;
+      if (currentTool !== 'paint') return;
       paintingRef.current = true;
       paintedIdsRef.current.clear();
     };
@@ -680,7 +716,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
         raycasterRef: raycasterRef as any,
         sceneRef: sceneRef as any,
         isDraggingRef,
-        selectedTool: (selectedTool === 'paint' ? 'select' : selectedTool) as 'select' | 'move',
+        selectedTool: () => (selectedToolRef.current === 'move' ? 'move' : 'select'),
         selectedBlockIdsRef: groupSelectedIdsRef as any,
         blocksRef: blocksRef as any,
         groundRef: groundRef as any,
@@ -730,15 +766,15 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
           const pos = player.position as any;
           if (bt === 'start') {
             checkpointRef.current = new THREE.Vector3(pos.x, pos.y, pos.z);
-            try { (Scene3D as any).props?.onGameStart?.({ x: pos.x, y: pos.y, z: pos.z }); } catch {}
+            try { callbacksRef.current.onGameStart?.({ x: pos.x, y: pos.y, z: pos.z }); } catch {}
           } else if (bt === 'checkpoint') {
             checkpointRef.current = new THREE.Vector3(pos.x, pos.y, pos.z);
-            try { (Scene3D as any).props?.onGameCheckpoint?.({ x: pos.x, y: pos.y, z: pos.z }); } catch {}
+            try { callbacksRef.current.onGameCheckpoint?.({ x: pos.x, y: pos.y, z: pos.z }); } catch {}
           } else if (bt === 'finish') {
             const now = performance.now();
             if (now - lastFinishAtRef.current > 1000) {
               lastFinishAtRef.current = now;
-              try { (Scene3D as any).props?.onGameFinish?.({ x: pos.x, y: pos.y, z: pos.z }); } catch {}
+              try { callbacksRef.current.onGameFinish?.({ x: pos.x, y: pos.y, z: pos.z }); } catch {}
             }
           } else if (bt === 'hazard') {
             const resp = (checkpointRef.current || spawnRef.current);
@@ -750,7 +786,7 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
                 playerRef.current.mesh.position.set(resp.x, resp.y, resp.z);
               } catch {}
             }
-            try { (Scene3D as any).props?.onGameHazard?.(resp ? { x: resp.x, y: resp.y, z: resp.z } : { x: pos.x, y: pos.y, z: pos.z }); } catch {}
+            try { callbacksRef.current.onGameHazard?.(resp ? { x: resp.x, y: resp.y, z: resp.z } : { x: pos.x, y: pos.y, z: pos.z }); } catch {}
           } else if (bt === 'cube_bouncy') {
             try {
               player.velocity.y = Math.max(player.velocity.y, 12);
@@ -1309,3 +1345,4 @@ const Scene3D = ({ onBlockAdd, droppedBlock, onSceneStateChange, loadedBlocks, s
 };
 
 export default memo(Scene3D);
+

@@ -1,4 +1,4 @@
-import 'dotenv/config';
+﻿import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -14,30 +14,30 @@ const app = express();
 const NEWS = [
   {
     id: 'water-glass',
-    title: 'Nowe bloki w edytorze: Woda i Szkło!',
-    description: 'Zanurz się w kreatywności dzięki nowym, realistycznym blokom wody i szkła.',
+    title: 'Nowe bloki w edytorze: Woda i SzkÅ‚o!',
+    description: 'Zanurz siÄ™ w kreatywnoÅ›ci dziÄ™ki nowym, realistycznym blokom wody i szkÅ‚a.',
     image: '/news-water-glass.svg',
     date: '2024-07-20',
     category: 'Aktualizacja',
     href: '/news/water-glass',
     content:
-      'Wprowadziliśmy dwa nowe bloki: Woda oraz Szkło.\n\nWoda umożliwia tworzenie jezior i rzek, a Szkło pozwala budować efektowne konstrukcje.\n\nSkorzystaj z trybu Budowy, aby dodać nowe bloki do świata i udostępnij efekty!'
+      'WprowadziliÅ›my dwa nowe bloki: Woda oraz SzkÅ‚o.\n\nWoda umoÅ¼liwia tworzenie jezior i rzek, a SzkÅ‚o pozwala budowaÄ‡ efektowne konstrukcje.\n\nSkorzystaj z trybu Budowy, aby dodaÄ‡ nowe bloki do Å›wiata i udostÄ™pnij efekty!'
   },
   {
     id: 'castle-contest',
     title: 'Konkurs na najlepszy zamek',
-    description: 'Pokaż swoje umiejętności i wygraj nagrody w konkursie budowlanym.',
+    description: 'PokaÅ¼ swoje umiejÄ™tnoÅ›ci i wygraj nagrody w konkursie budowlanym.',
     image: '/news-castle-contest.svg',
     date: '2024-07-18',
-    category: 'Społeczność',
+    category: 'SpoÅ‚ecznoÅ›Ä‡',
     href: '/news/castle-contest',
     content:
-      'Zapraszamy do udziału w konkursie na najlepszy zamek!\n\nOpublikuj swój projekt i wyślij link do 31 sierpnia.\n\nNajlepsze prace wyróżnimy na stronie głównej.'
+      'Zapraszamy do udziaÅ‚u w konkursie na najlepszy zamek!\n\nOpublikuj swÃ³j projekt i wyÅ›lij link do 31 sierpnia.\n\nNajlepsze prace wyrÃ³Å¼nimy na stronie gÅ‚Ã³wnej.'
   },
 ];
 
 // CORS for cookie-based refresh endpoint
-const ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:8080';
+const ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:9000';
 app.use(
   cors({
     origin: ORIGIN,
@@ -318,11 +318,11 @@ app.post('/api/users/me/password', requireAuth, async (req, res) => {
 app.get('/api/users/me/permissions', requireAuth, async (req, res) => {
   const role = req.user.role;
   const base = [
-    'Zarządzanie kontem i profilem',
-    'Tworzenie i edycja własnych gier',
+    'ZarzÄ…dzanie kontem i profilem',
+    'Tworzenie i edycja wÅ‚asnych gier',
   ];
   const adminExtra = [
-    'Zarządzanie użytkownikami i treściami',
+    'ZarzÄ…dzanie uÅ¼ytkownikami i treÅ›ciami',
   ];
   const permissions = role === 'ADMIN' ? [...base, ...adminExtra] : base;
   res.json({ role, permissions });
@@ -402,7 +402,7 @@ app.get('/api/games', async (req, res) => {
         })
       ]);
 
-      let list = games.map(g => ({ id: g.id, name: g.name, updatedAt: g.updatedAt, ownerName: g.owner?.name || 'Użytkownik', likes: g._count?.likes || 0, thumbnail: g.thumbnail || null }));
+      let list = games.map(g => ({ id: g.id, name: g.name, updatedAt: g.updatedAt, ownerName: g.owner?.name || 'UÅ¼ytkownik', likes: g._count?.likes || 0, thumbnail: g.thumbnail || null }));
       if (orderBy.likes) {
         list.sort((a, b) => orderBy.likes === 'desc' ? (b.likes - a.likes) : (a.likes - b.likes));
       }
@@ -426,7 +426,7 @@ app.get('/api/games', async (req, res) => {
         }).catch(() => Promise.resolve([])),
       ]);
       res.json({
-        games: games.map(g => ({ id: g.id, name: g.name, updatedAt: g.updatedAt, ownerName: 'Użytkownik', likes: 0, thumbnail: null })),
+        games: games.map(g => ({ id: g.id, name: g.name, updatedAt: g.updatedAt, ownerName: 'UÅ¼ytkownik', likes: 0, thumbnail: null })),
         total,
         page,
         limit,
@@ -553,7 +553,7 @@ app.get('/api/creators/top', async (_req, res) => {
     const byOwner = new Map();
     for (const g of games) {
       const key = g.ownerId || (g.owner?.id ?? 'unknown');
-      const prev = byOwner.get(key) || { id: key, name: g.owner?.name || 'Twórca', avatarUrl: g.owner?.avatarUrl || '/avatar-default.svg', creations: 0, likes: 0 };
+      const prev = byOwner.get(key) || { id: key, name: g.owner?.name || 'TwÃ³rca', avatarUrl: g.owner?.avatarUrl || '/avatar-default.svg', creations: 0, likes: 0 };
       prev.creations += 1;
       prev.likes += g._count?.likes || 0;
       byOwner.set(key, prev);
